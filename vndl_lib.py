@@ -3,6 +3,7 @@ from __future__ import division
 from selenium import webdriver
 import time
 import sys
+import os.path
 import requests
 
 # Open a new Chrome browser
@@ -29,6 +30,11 @@ def progressBar(bps, bar_size, total_downloaded, total_size) :
   num_bars = bar_size*percent_done
   print("[" + "="*int(num_bars) + " "*int(bar_size-num_bars) + "] " + str(round(percent_done*100, 2)) + "%  Speed: " + speed, end="\r")
 
+# Thanks stackoverflow
+def sanitizeFilename(filename) :
+    keepcharacters = (' ','.','_')
+    return "".join(c for c in filename if c.isalnum() or c in keepcharacters).rstrip()
+
 # Download a file from a uri into directory/filename
 def downloadFile(url, directory, filename) :
   with open(directory + '/' + filename, 'wb') as f:
@@ -39,7 +45,7 @@ def downloadFile(url, directory, filename) :
     if total_length is None: # no content length header
       f.write(r.content)
     else:
-      for chunk in r.iter_content(1024):
+      for chunk in r.iter_content(1024*1024):
         dl += len(chunk)
         f.write(chunk)
         progressBar(dl/(time.clock()-start), 25, dl, total_length)
@@ -77,11 +83,15 @@ def get_video_list(browser) :
 def download_class_video(browser, video_id, directory) :
     videos = get_video_list(browser)
     to_download = videos[video_id]
-    video_name = str(to_download.text)
+    video_name = sanitizeFilename(str(to_download.text))
+    if (os.path.isfile(directory + '/' + video_name + ".mp4")):
+      print("Skipping: " + video_name + " ... file already exists!")
+      return 0
     print("Downloading: " + video_name)
     to_download.click()
     time.sleep(3)
     download_video(browser, directory, video_name)
+    return 1
 
 # Download all the videos in a given class
 def download_class(browser, directory, class_number) :
@@ -89,6 +99,6 @@ def download_class(browser, directory, class_number) :
     time.sleep(3)
     num_videos = len(get_video_list(browser))
     for i in range(1, num_videos) :
-        download_class_video(browser, num_videos - i, directory)
-        browser.get('http://cornell.videonote.com/channels/' + str(class_number) + '/videos') # test
-        time.sleep(3)
+        if (download_class_video(browser, num_videos - i, directory) == 1):
+            browser.get('http://cornell.videonote.com/channels/' + str(class_number) + '/videos') # test
+            time.sleep(3)
