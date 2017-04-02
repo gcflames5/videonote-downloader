@@ -11,7 +11,7 @@ def init_browser() :
     return webdriver.Chrome()
 
 # Close the browser and end process
-def destory_browser(browser) :
+def destroy_browser(browser) :
     browser.quit()
 
 # Return a string showing download speed given bps
@@ -45,7 +45,7 @@ def downloadFile(url, directory, filename) :
     if total_length is None: # no content length header
       f.write(r.content)
     else:
-      for chunk in r.iter_content(1024*1024):
+      for chunk in r.iter_content(1024*256):
         dl += len(chunk)
         f.write(chunk)
         progressBar(dl/(time.clock()-start), 25, dl, total_length)

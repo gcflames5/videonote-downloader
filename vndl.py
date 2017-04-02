@@ -18,9 +18,14 @@ browser = vndl.init_browser()
 user = raw_input("Cornell netid: ")
 password = getpass.getpass("Password: ")
 vndl.videonote_login(browser, user, password)
-class_num = int(raw_input("Enter class number: "))
-Tk().withdraw()
-path = askdirectory()
-print("Downloading videos to: " + path)
-vndl.download_class(browser, path, class_num)
-destory_browser(browser)
+while (1) :
+    class_num = int(raw_input("Enter class number: "))
+    Tk().withdraw()
+    path = askdirectory()
+    print("Downloading videos to: " + path)
+    vndl.download_class(browser, path, class_num)
+    cont = raw_input("Download Complete! Download another class? [y/n] ")
+    if (cont == "n" or cont == "N") :
+        break
+
+vndl.destroy_browser(browser)
