@@ -98,7 +98,7 @@ def download_class(browser, directory, class_number) :
     browser.get('http://cornell.videonote.com/channels/' + str(class_number) + '/videos') # test
     time.sleep(3)
     num_videos = len(get_video_list(browser))
-    for i in range(1, num_videos) :
+    for i in range(1, num_videos+1) :
         if (download_class_video(browser, num_videos - i, directory) == 1):
             browser.get('http://cornell.videonote.com/channels/' + str(class_number) + '/videos') # test
             time.sleep(3)
